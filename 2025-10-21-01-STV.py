@@ -78,7 +78,7 @@ votes_total = len(ballots)
 
 threshold = votes_total / SIZE
 
-print(threshold)
+print("Threshold for Election: " + str(threshold))
 
 seed = int(input("Please provide with a seed: "))
 rand.seed(seed)
@@ -101,8 +101,10 @@ while True:
     for i, j in candidates.items():
         candidates[i] = 0
     for i in ballots:
-        if i["currpos"] != -1:
+        if not i["currpos"] == -1:
             candidates[i["order"][i["currpos"]]] += i["currvalue"]
+    
+    print(candidates)
     
     temp = copy.deepcopy(candidates)
     rounds.append(temp)
@@ -111,13 +113,17 @@ while True:
     flag = 0
     for i, j in candidates.items():
         if j >= votes_total/SIZE:
-            elected.append(i)
-            flag = 1
-            print("The candidate " + i + " has attained " + str(j) + " / " + str(votes_total/SIZE) + " votes.")
-            print(str(j - votes_total/SIZE) + " votes are now transferred.")
-            for k in ballots:
-                if k["order"][k["currpos"]] == i:
-                    k["currvalue"] *= (j - votes_total/SIZE) / j
+            if i not in elected:
+                elected.append(i)
+                flag = 1
+                print("The candidate " + i + " has been elected with " + str(j) + " / " + str(votes_total/SIZE) + " votes.")
+
+                if "(IND)" in i:
+                    print(str(j - votes_total/SIZE) + " votes are now transferred.")
+
+                    for k in ballots:
+                        if k["order"][k["currpos"]] == i:
+                            k["currvalue"] *= (j - votes_total/SIZE) / j
     if flag == 0:
         least_votes = []
         least_votes_count = votes_total
@@ -144,7 +150,7 @@ while True:
         
         deltaPos = 0
         checkName = ballotOrder[ballotPosition + deltaPos]
-        while checkName in elected or checkName in eliminated:
+        while (checkName in elected and "(IND)" in checkName) or checkName in eliminated:
             deltaPos += 1
             if ballotPosition + deltaPos >= len(ballotOrder):
                 break
