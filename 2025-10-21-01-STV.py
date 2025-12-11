@@ -139,15 +139,24 @@ while True:
             eliminated.append(resolved)
 
     for i in ballots:
-        j = 0
-        while (i["order"][i["currpos"] + j] in elected or i["order"][i["currpos"] + j] in eliminated):
-            j += 1
-            if i["currpos"] + j >= len(i["order"]):
+        ballotOrder = i["order"]
+        ballotPosition = i["currpos"]
+        
+        deltaPos = 0
+        checkName = ballotOrder[ballotPosition + deltaPos]
+        while checkName in elected or checkName in eliminated:
+            deltaPos += 1
+            if ballotPosition + deltaPos >= len(ballotOrder):
                 break
-        if i["currpos"] + j >= len(i["order"]):
-            i["currpos"] = -1
+
+            checkName = ballotOrder[ballotPosition + deltaPos]
+        
+        if ballotPosition + deltaPos >= len(ballotOrder):
+            ballotPosition = -1
         else:
-            i["currpos"] += j
+            ballotPosition += deltaPos
+        
+        i["currpos"] = ballotPosition
 
     round += 1
 
