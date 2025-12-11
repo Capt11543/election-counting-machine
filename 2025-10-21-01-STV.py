@@ -33,11 +33,11 @@ def BreakTie(round, rounds, tied, votes_total):
 SIZE = 16 # Number of Winners
 
 myfile = open("input.txt") # Name (or path) of input file.
-ballot = myfile.read()
-ballot = ballot.split("\n")
-for i in range(len(ballot)):
-    ballot[i] = ballot[i][84:]
-    ballot[i] = ballot[i].split(", ")
+ballots = myfile.read()
+ballots = ballots.split("\n")
+for i in range(len(ballots)):
+    ballots[i] = ballots[i][84:]
+    ballots[i] = ballots[i].split(", ")
 
 candidates = ['Twiscet (IND)',
               'bloodyrebals (IND)',
@@ -68,13 +68,13 @@ eliminated = []
 
 # Initialising
 
-for i in range(len(ballot)):
-    ballot[i] = {"currpos": 0, "currvalue": 1, "order": ballot[i]}
+for i in range(len(ballots)):
+    ballots[i] = {"currpos": 0, "currvalue": 1, "order": ballots[i]}
 
 
 candidates = {i: 0 for i in candidates}
 
-votes_total = len(ballot)
+votes_total = len(ballots)
 
 threshold = votes_total / SIZE
 
@@ -100,7 +100,7 @@ while True:
     
     for i, j in candidates.items():
         candidates[i] = 0
-    for i in ballot:
+    for i in ballots:
         if i["currpos"] != -1:
             candidates[i["order"][i["currpos"]]] += i["currvalue"]
     
@@ -115,7 +115,7 @@ while True:
             flag = 1
             print("The candidate " + i + " has attained " + str(j) + " / " + str(votes_total/SIZE) + " votes.")
             print(str(j - votes_total/SIZE) + " votes are now transferred.")
-            for k in ballot:
+            for k in ballots:
                 if k["order"][k["currpos"]] == i:
                     k["currvalue"] *= (j - votes_total/SIZE) / j
     if flag == 0:
@@ -138,7 +138,7 @@ while True:
             print("The candidate " + resolved + " has been eliminated with " + str(least_votes_count) + " votes.")
             eliminated.append(resolved)
 
-    for i in ballot:
+    for i in ballots:
         j = 0
         while (i["order"][i["currpos"] + j] in elected or i["order"][i["currpos"] + j] in eliminated):
             j += 1
