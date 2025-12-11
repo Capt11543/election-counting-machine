@@ -90,12 +90,16 @@ rounds = []
 
 while True:
     print("\nRound " + str(round))
-    if len(candidates) - len(eliminated) <= SIZE:
-        print("As there are only " + str(len(candidates) - len(eliminated) - len(elected)) + " candidates left and still " + str(SIZE - len(elected)) + " mandates, all remaining candidates will receive a mandate.")
-        for i in candidates.keys():
-            if i not in elected and i not in eliminated:
-                elected.append(i)
-                print("Candidate " + i + " was elected.")
+    
+    # if len(candidates) - len(eliminated) <= SIZE:
+    #     print("As there are only " + str(len(candidates) - len(eliminated) - len(elected)) + " candidates left and still " + str(SIZE - len(elected)) + " mandates, all remaining candidates will receive a mandate.")
+    #     for i in candidates.keys():
+    #         if i not in elected and i not in eliminated:
+    #             elected.append(i)
+    #             print("Candidate " + i + " was elected.")
+    #     break
+    if len(elected) + len(eliminated) >= len(candidates):
+        print("All candidates have been elected or eliminated.")
         break
     
     for i, j in candidates.items():
