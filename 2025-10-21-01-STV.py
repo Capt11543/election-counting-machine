@@ -61,8 +61,9 @@ candidates = ['Twiscet (IND)',
               'ComplexKing (IND)',
               'CasualGreyKnight (LPS)',
               'Taelor (IND)'] # List of all Candidates
+parties = ['LPS', 'GREENS'] # List of all Parties
 
-elected = []
+elected = {}
 eliminated = []
 
 
@@ -72,7 +73,8 @@ for i in range(len(ballots)):
     ballots[i] = {"currpos": 0, "currvalue": 1, "order": ballots[i]}
 
 
-candidates = {i: 0 for i in candidates}
+candidates = {name: 0 for name in candidates}
+parties = {party: 0 for party in parties}
 
 votes_total = len(ballots)
 
@@ -88,25 +90,28 @@ rand.seed(seed)
 round = 0
 rounds = []
 
-while True:
+
+def should_freeze_score(check_name):
+    return check_name in elected and "(IND)" in check_name
+
+
+while len(elected) + len(eliminated) >= len(candidates):
     print("\nRound " + str(round))
     
-    # if len(candidates) - len(eliminated) <= SIZE:
-    #     print("As there are only " + str(len(candidates) - len(eliminated) - len(elected)) + " candidates left and still " + str(SIZE - len(elected)) + " mandates, all remaining candidates will receive a mandate.")
-    #     for i in candidates.keys():
-    #         if i not in elected and i not in eliminated:
-    #             elected.append(i)
-    #             print("Candidate " + i + " was elected.")
-    #     break
-    if len(elected) + len(eliminated) >= len(candidates):
-        print("All candidates have been elected or eliminated.")
-        break
+    for name in candidates:
+        if not should_freeze_score(name):
+            candidates[name] = 0
     
-    for i, j in candidates.items():
-        candidates[i] = 0
     for i in ballots:
+        ballot_position = i["currpos"]
+        ballot_order = i["order"]
+        
         if not i["currpos"] == -1:
-            candidates[i["order"][i["currpos"]]] += i["currvalue"]
+            check_name = candidates[ballot_order[ballot_position]]
+            if not should_freeze_score(ballot_order[ballot_position]):
+                candidates[i["order"][i["currpos"]]] += i["currvalue"]
+    
+    elected = {name: candidates[name] for name in candidates if name in elected}
     
     print(candidates)
     
@@ -114,12 +119,12 @@ while True:
     rounds.append(temp)
     del temp
     
-    flag = 0
+    quota_this_round = False
     for i, j in candidates.items():
         if j >= votes_total/SIZE:
             if i not in elected:
-                elected.append(i)
-                flag = 1
+                elected[i] = j
+                quota_this_round = True
                 print("The candidate " + i + " has been elected with " + str(j) + " / " + str(votes_total/SIZE) + " votes.")
 
                 if "(IND)" in i:
@@ -128,7 +133,8 @@ while True:
                     for k in ballots:
                         if k["order"][k["currpos"]] == i:
                             k["currvalue"] *= (j - votes_total/SIZE) / j
-    if flag == 0:
+    
+    if not quota_this_round:
         least_votes = []
         least_votes_count = votes_total
         for i, j in candidates.items():
@@ -171,9 +177,19 @@ while True:
     round += 1
 
 
+# Tally votes by party
+for name in elected:
+    for party in parties:
+        if f"({party})" in name:
+            parties[party] += elected[name]
+
+
 # Result
 
 print("\nThe following candidates have been elected:")
 print(elected)
 
-input()
+print("---")
+
+print("The following votes have been won by each party:")
+print(parties)
