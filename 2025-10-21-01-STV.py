@@ -3,7 +3,7 @@ import copy
 
 
 
-def BreakTie(round, rounds, tied, votes_total):
+def break_tie(round, rounds, tied, votes_total):
     if round < 1:
         print("As the tie could not be resolved through other means, a candidate will be randomly eliminated.")
         return rand.choice(tied)
@@ -23,7 +23,7 @@ def BreakTie(round, rounds, tied, votes_total):
         print("The tie could be resolved by the totals of the previous round.")
         return least_votes[0]
     else:
-        return BreakTie(round - 1, rounds, least_votes, votes_total)
+        return break_tie(round - 1, rounds, least_votes, votes_total)
     
     print()
 
@@ -95,21 +95,22 @@ def should_freeze_score(check_name):
     return check_name in elected and "(IND)" in check_name
 
 
-while len(elected) + len(eliminated) >= len(candidates):
+while len(elected) + len(eliminated) < len(candidates):
     print("\nRound " + str(round))
     
     for name in candidates:
         if not should_freeze_score(name):
             candidates[name] = 0
     
-    for i in ballots:
-        ballot_position = i["currpos"]
-        ballot_order = i["order"]
+    for ballot in ballots:
+        ballot_position = ballot["currpos"]
+        ballot_order = ballot["order"]
+        ballot_value = ballot["currvalue"]
         
-        if not i["currpos"] == -1:
-            check_name = candidates[ballot_order[ballot_position]]
-            if not should_freeze_score(ballot_order[ballot_position]):
-                candidates[i["order"][i["currpos"]]] += i["currvalue"]
+        if not ballot_position == -1:
+            check_name = ballot_order[ballot_position]
+            if not should_freeze_score(check_name):
+                candidates[check_name] += ballot_value
     
     elected = {name: candidates[name] for name in candidates if name in elected}
     
@@ -120,43 +121,49 @@ while len(elected) + len(eliminated) >= len(candidates):
     del temp
     
     quota_this_round = False
-    for i, j in candidates.items():
-        if j >= votes_total/SIZE:
-            if i not in elected:
-                elected[i] = j
+    for name, votes in candidates.items():
+        if votes >= threshold:
+            if name not in elected:
+                elected[name] = votes
+                
                 quota_this_round = True
-                print("The candidate " + i + " has been elected with " + str(j) + " / " + str(votes_total/SIZE) + " votes.")
+                print("The candidate " + name + " has been elected with " + str(votes) + " / " + str(threshold) + " votes.")
 
-                if "(IND)" in i:
-                    print(str(j - votes_total/SIZE) + " votes are now transferred.")
+                if "(IND)" in name:
+                    transfer_value = (votes - threshold) / votes
+                    print(str(transfer_value * votes) + " votes are now transferred.")
 
-                    for k in ballots:
-                        if k["order"][k["currpos"]] == i:
-                            k["currvalue"] *= (j - votes_total/SIZE) / j
+                    for ballot in ballots:
+                        ballot_order = ballot["order"]
+                        ballot_position = ballot["currpos"]
+                        
+                        check_name = ballot_order[ballot_position]
+                        if check_name == name:
+                            ballot["currvalue"] *= transfer_value
     
     if not quota_this_round:
         least_votes = []
         least_votes_count = votes_total
-        for i, j in candidates.items():
-            if not (i in elected or i in eliminated):
-                if j < least_votes_count:
-                    least_votes = [i]
-                    least_votes_count = j
-                elif j == least_votes_count:
-                    least_votes.append(i)
+        for name, votes in candidates.items():
+            if not (name in elected or name in eliminated):
+                if votes < least_votes_count:
+                    least_votes = [name]
+                    least_votes_count = votes
+                elif votes == least_votes_count:
+                    least_votes.append(name)
         
         if len(least_votes) == 1:
             print("The candidate " + least_votes[0] + " has been eliminated with " + str(least_votes_count) + " votes.")
             eliminated.append(least_votes[0])
         else:
             print("A tie has to be broken between " + str(least_votes) + ".")
-            resolved = BreakTie(round, rounds, least_votes, votes_total)
+            resolved = break_tie(round, rounds, least_votes, votes_total)
             print("The candidate " + resolved + " has been eliminated with " + str(least_votes_count) + " votes.")
             eliminated.append(resolved)
 
-    for i in ballots:
-        ballot_order = i["order"]
-        ballot_position = i["currpos"]
+    for ballot in ballots:
+        ballot_order = ballot["order"]
+        ballot_position = ballot["currpos"]
         
         delta_pos = 0
         check_name = ballot_order[ballot_position + delta_pos]
@@ -172,7 +179,7 @@ while len(elected) + len(eliminated) >= len(candidates):
         else:
             ballot_position += delta_pos
         
-        i["currpos"] = ballot_position
+        ballot["currpos"] = ballot_position
 
     round += 1
 
