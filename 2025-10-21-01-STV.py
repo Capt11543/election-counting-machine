@@ -196,7 +196,48 @@ for name in elected:
 print("\nThe following candidates have been elected:")
 print(elected)
 
-print("---")
+print("\n---\n")
 
 print("The following votes have been won by each party:")
 print(parties)
+
+
+party_seats = {party: 0 for party in parties}
+party_quotients = {party: parties[party] / (2 * party_seats[party] + 1) for party in parties}
+
+seats_for_parties = SIZE
+for name in elected:
+    if "(IND)" in name:
+        seats_for_parties -= 1
+
+print(str(seats_for_parties) + " seats are to be apportioned among the parties.")
+
+round = 0
+while round < seats_for_parties:
+    print("\nRound " + str(round))
+    print("Party Seats:" + str(party_seats))
+    print("Party Quotients:" + str(party_quotients))
+    
+    highest_quotient = 0
+    highest_parties = []
+    for party in parties:
+        if party_quotients[party] > highest_quotient:
+            highest_quotient = party_quotients[party]
+            highest_parties = [party]
+        elif party_quotients[party] == highest_quotient:
+            highest_parties.append(party)
+    
+    if len(highest_parties) == 1:
+        winning_party = highest_parties[0]
+    else:
+        winning_party = max(highest_parties, key=lambda x: parties[x])
+    
+    print(winning_party + " wins a seat this round.")
+    
+    party_seats[winning_party] += 1
+    party_quotients[winning_party] = parties[winning_party] / (2 * party_seats[winning_party] + 1)
+    
+    round += 1
+
+print("\nThe parties have been apportioned the following number of seats:")
+print(party_seats)
