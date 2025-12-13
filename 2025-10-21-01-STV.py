@@ -76,6 +76,13 @@ for i in range(len(ballots)):
 candidates = {name: 0 for name in candidates}
 parties = {party: 0 for party in parties}
 
+candidate_preferences = {name: [0] * len(candidates) for name in candidates}
+for ballot in ballots:
+    ballot_order = ballot["order"]
+    for position in range(len(ballot_order)):
+        name = ballot_order[position]
+        candidate_preferences[name][position] += 1
+
 votes_total = len(ballots)
 
 threshold = votes_total / SIZE
