@@ -7,23 +7,28 @@ def backtrack_rounds(round, rounds, tied, votes_total):
     if round < 1:
         return ""
     
-    tied = {i: rounds[round - 1][i] for i in tied}
+    tied_this_round = {name: rounds[round - 1][name] for name in tied}
     print("Backtracking to round " + str(round - 1) + ": " + str(tied))
 
     least_votes = []
     least_votes_count = votes_total
-    for i, j in tied.items():
-        if j < least_votes_count:
-            least_votes = [i]
-            least_votes_count = j
-        elif j == least_votes_count:
-            least_votes.append(i)
+    for name, votes in tied_this_round.items():
+        if votes < least_votes_count:
+            least_votes = [name]
+            least_votes_count = votes
+        elif votes == least_votes_count:
+            least_votes.append(name)
     
     if len(least_votes) == 1:
         print("The tie could be resolved by the totals of the previous round.")
         return least_votes[0]
     else:
-        return backtrack_rounds(round - 1, rounds, least_votes, votes_total)
+        for candidate in tied_this_round:
+            if candidate not in least_votes:
+                print(candidate + " is no longer tied.")
+                tied.remove(candidate)
+
+        return backtrack_rounds(round - 1, rounds, tied, votes_total)
 
 
 def compare_preferences(tied, num_candidates, preferences):
