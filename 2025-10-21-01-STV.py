@@ -3,13 +3,13 @@ import copy
 
 
 
-def break_tie(round, rounds, tied, votes_total):
+def backtrack_rounds(round, rounds, tied, votes_total):
     if round < 1:
-        print("As the tie could not be resolved through other means, a candidate will be randomly eliminated.")
-        return rand.choice(tied)
+        return ""
+    
     tied = {i: rounds[round - 1][i] for i in tied}
     print("Backtracking to round " + str(round - 1) + ": " + str(tied))
-    
+
     least_votes = []
     least_votes_count = votes_total
     for i, j in tied.items():
@@ -23,9 +23,50 @@ def break_tie(round, rounds, tied, votes_total):
         print("The tie could be resolved by the totals of the previous round.")
         return least_votes[0]
     else:
-        return break_tie(round - 1, rounds, least_votes, votes_total)
+        return backtrack_rounds(round - 1, rounds, least_votes, votes_total)
+
+
+def compare_preferences(tied, num_candidates, preferences):
+    for preference in range(num_candidates):
+        ordinal_num = preference + 1
+        ordinal_str = str(ordinal_num) + ("st" if (ordinal_num) % 10 == 1 and not (ordinal_num) / 10 == 1 else "nd" if (ordinal_num) % 10 == 2 and not (ordinal_num) / 10 == 1 else "rd" if (ordinal_num) % 10 == 3 and not (ordinal_num) / 10 == 1 else "th")
+
+        print("Comparing " + ordinal_str + " choice votes...")
+
+        lowest_count = votes_total
+        lowest_candidates = []
+
+        tied_this_round = {tied[i]: preferences[tied[i]][preference] for i in range(len(tied))}
+        print(tied_this_round)
+
+        for candidate in tied_this_round:
+            candidate_count = tied_this_round[candidate]
+            if candidate_count < lowest_count:
+                lowest_count = candidate_count
+                lowest_candidates = [candidate]
+            elif candidate_count == lowest_count:
+                lowest_candidates.append(candidate)
+
+        if len(lowest_candidates) == 1:
+            print("Tie broken after comparing " + ordinal_str  + " choice votes")
+            return lowest_candidates[0]
+        
+        for candidate in tied_this_round:
+            if candidate not in lowest_candidates:
+                print(candidate + " is no longer tied.")
+                tied.remove(candidate)
     
-    print()
+    return ""
+
+def break_tie(round, rounds, tied, votes_total, num_candidates, preferences):
+    result = backtrack_rounds(round, rounds, tied, votes_total)
+    if result == "":
+        result = compare_preferences(tied, num_candidates, preferences)
+    if result == "":
+        print("As the tie could not be resolved through other means, a candidate will be randomly eliminated.")
+        result = rand.choice(tied)
+    
+    return result
 
 
 # INPUT
@@ -164,7 +205,7 @@ while len(elected) + len(eliminated) < len(candidates):
             eliminated.append(least_votes[0])
         else:
             print("A tie has to be broken between " + str(least_votes) + ".")
-            resolved = break_tie(round, rounds, least_votes, votes_total)
+            resolved = break_tie(round, rounds, least_votes, votes_total, len(candidates), candidate_preferences)
             print("The candidate " + resolved + " has been eliminated with " + str(least_votes_count) + " votes.")
             eliminated.append(resolved)
 
