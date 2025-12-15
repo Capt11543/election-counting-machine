@@ -104,7 +104,7 @@ candidates = ['Twiscet (IND)',
               'Taelor (IND)'] # List of all Candidates
 parties = ['LPS', 'GREENS'] # List of all Parties
 
-elected = {}
+achieved_quorum = {}
 eliminated = []
 
 
@@ -140,10 +140,10 @@ rounds = []
 
 
 def should_freeze_score(check_name):
-    return check_name in elected and "(IND)" in check_name
+    return check_name in achieved_quorum and "(IND)" in check_name
 
 
-while len(elected) + len(eliminated) < len(candidates):
+while len(achieved_quorum) + len(eliminated) < len(candidates):
     print("\nRound " + str(round))
     
     for name in candidates:
@@ -160,7 +160,7 @@ while len(elected) + len(eliminated) < len(candidates):
             if not should_freeze_score(check_name):
                 candidates[check_name] += ballot_value
     
-    elected = {name: candidates[name] for name in candidates if name in elected}
+    achieved_quorum = {name: candidates[name] for name in candidates if name in achieved_quorum}
     
     print(candidates)
     
@@ -171,8 +171,8 @@ while len(elected) + len(eliminated) < len(candidates):
     quota_this_round = False
     for name, votes in candidates.items():
         if votes >= threshold:
-            if name not in elected:
-                elected[name] = votes
+            if name not in achieved_quorum:
+                achieved_quorum[name] = votes
                 
                 quota_this_round = True
                 print("The candidate " + name + " has been elected with " + str(votes) + " / " + str(threshold) + " votes.")
@@ -193,7 +193,7 @@ while len(elected) + len(eliminated) < len(candidates):
         least_votes = []
         least_votes_count = votes_total
         for name, votes in candidates.items():
-            if not (name in elected or name in eliminated):
+            if not (name in achieved_quorum or name in eliminated):
                 if votes < least_votes_count:
                     least_votes = [name]
                     least_votes_count = votes
@@ -215,7 +215,7 @@ while len(elected) + len(eliminated) < len(candidates):
         
         delta_pos = 0
         check_name = ballot_order[ballot_position + delta_pos]
-        while (check_name in elected and "(IND)" in check_name) or check_name in eliminated:
+        while (check_name in achieved_quorum and "(IND)" in check_name) or check_name in eliminated:
             delta_pos += 1
             if ballot_position + delta_pos >= len(ballot_order):
                 break
@@ -233,16 +233,16 @@ while len(elected) + len(eliminated) < len(candidates):
 
 
 # Tally votes by party
-for name in elected:
+for name in achieved_quorum:
     for party in parties:
         if f"({party})" in name:
-            parties[party] += elected[name]
+            parties[party] += achieved_quorum[name]
 
 
 # Result
 
 print("\nThe following candidates have been elected:")
-print(elected)
+print(achieved_quorum)
 
 print("\n---\n")
 
@@ -254,7 +254,7 @@ party_seats = {party: 0 for party in parties}
 party_quotients = {party: parties[party] / (2 * party_seats[party] + 1) for party in parties}
 
 seats_for_parties = SIZE
-for name in elected:
+for name in achieved_quorum:
     if "(IND)" in name:
         seats_for_parties -= 1
 
@@ -289,3 +289,28 @@ while round < seats_for_parties:
 
 print("\nThe parties have been apportioned the following number of seats:")
 print(party_seats)
+
+
+elected = []
+
+for name in achieved_quorum:
+    if "(IND)" in name:
+        elected.append(name)
+
+for party in parties:
+    for _ in range(party_seats[party]):
+        for name in achieved_quorum:
+            if f"({party})" in name and name not in elected:
+                elected.append(name)
+                break
+        else:
+            for name in reversed(eliminated):
+                if f"({party})" in name and name not in elected:
+                    elected.append(name)
+                    break
+            else:
+                elected.append(f"VACANT ({party})")
+
+print("\nThe following candidates have been elected to Parliament:")
+print(elected)
+print("Congratulations to the elected candidates!  Thank you for voting!")
