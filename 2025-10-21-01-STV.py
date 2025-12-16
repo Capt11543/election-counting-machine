@@ -85,30 +85,32 @@ for i in range(len(ballots)):
     ballots[i] = ballots[i][84:]
     ballots[i] = ballots[i].split(", ")
 
-candidates = ['Twiscet (IND)',
-              'bloodyrebals (IND)',
-              'Talion77 (GREENS)',
-              'ItsStormcraft (GREENS)',
-              'Capt11543 (LPS)',
-              'tortenwashere (LPS)',
-              'MrRoyaltys (LPS)',
-              'ConsequencesInc (LPS)',
-              'Dartanboy (IND)',
-              'JamesTheSlay (IND)',
-              'Ayatha (IND)',
-              'AmityBlamity (IND)',
-              'Pepecuu (IND)',
-              'WackJap (IND)',
-              'ameslap (IND)',
-              'RealImza (GREENS)',
-              'SoggehToast (LPS)',
-              'ConsequencesInc (LPS)',
-              'roryyy_ (LPS)',
-              'ComplexKing (IND)',
-              'CasualGreyKnight (LPS)',
-              'Taelor (IND)'] # List of all Candidates
-parties = ['LPS', 'GREENS'] # List of all Parties
+# candidates = ['Twiscet (IND)',
+#               'bloodyrebals (IND)',
+#               'Talion77 (GREENS)',
+#               'ItsStormcraft (GREENS)',
+#               'Capt11543 (LPS)',
+#               'tortenwashere (LPS)',
+#               'MrRoyaltys (LPS)',
+#               'ConsequencesInc (LPS)',
+#               'Dartanboy (IND)',
+#               'JamesTheSlay (IND)',
+#               'Ayatha (IND)',
+#               'AmityBlamity (IND)',
+#               'Pepecuu (IND)',
+#               'WackJap (IND)',
+#               'ameslap (IND)',
+#               'RealImza (GREENS)',
+#               'SoggehToast (LPS)',
+#               'ConsequencesInc (LPS)',
+#               'roryyy_ (LPS)',
+#               'ComplexKing (IND)',
+#               'CasualGreyKnight (LPS)',
+#               'Taelor (IND)'] # List of all Candidates
+# parties = ['LPS', 'GREENS'] # List of all Parties
 
+candidates = []
+parties = []
 achieved_quorum = {}
 eliminated = []
 
@@ -116,6 +118,14 @@ eliminated = []
 # Initialising
 
 for i in range(len(ballots)):
+    for name in ballots[i]:
+        if name not in candidates:
+            candidates.append(name)
+            if "(" in name and ")" in name:
+                party = name[name.index("(") + 1:name.index(")")]
+                if not party == "IND" and party not in parties:
+                    parties.append(party)
+    
     ballots[i] = {"currpos": 0, "currvalue": 1, "order": ballots[i]}
 
 
