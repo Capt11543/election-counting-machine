@@ -31,7 +31,3 @@ class Ballot:
                 break
         
         self.position += delta_pos
-
-
-
-
