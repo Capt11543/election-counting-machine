@@ -8,7 +8,7 @@ def backtrack_rounds(round, rounds, tied, votes_total):
         return ""
     
     tied_this_round = {name: rounds[round - 1][name] for name in tied}
-    print("Backtracking to round " + str(round - 1) + ": " + str(tied))
+    print("Backtracking to round " + str(round - 1) + ": " + str(tied_this_round))
 
     least_votes = []
     least_votes_count = votes_total
@@ -76,7 +76,7 @@ def break_tie(round, rounds, tied, votes_total, num_candidates, preferences):
 
 # INPUT
 
-SIZE = 16 # Number of Winners
+SIZE = int(input("Please enter the number of seats: ")) # Number of Winners
 
 myfile = open("input.txt") # Name (or path) of input file.
 ballots = myfile.read()
@@ -84,30 +84,6 @@ ballots = ballots.split("\n")
 for i in range(len(ballots)):
     ballots[i] = ballots[i][84:]
     ballots[i] = ballots[i].split(", ")
-
-# candidates = ['Twiscet (IND)',
-#               'bloodyrebals (IND)',
-#               'Talion77 (GREENS)',
-#               'ItsStormcraft (GREENS)',
-#               'Capt11543 (LPS)',
-#               'tortenwashere (LPS)',
-#               'MrRoyaltys (LPS)',
-#               'ConsequencesInc (LPS)',
-#               'Dartanboy (IND)',
-#               'JamesTheSlay (IND)',
-#               'Ayatha (IND)',
-#               'AmityBlamity (IND)',
-#               'Pepecuu (IND)',
-#               'WackJap (IND)',
-#               'ameslap (IND)',
-#               'RealImza (GREENS)',
-#               'SoggehToast (LPS)',
-#               'ConsequencesInc (LPS)',
-#               'roryyy_ (LPS)',
-#               'ComplexKing (IND)',
-#               'CasualGreyKnight (LPS)',
-#               'Taelor (IND)'] # List of all Candidates
-# parties = ['LPS', 'GREENS'] # List of all Parties
 
 candidates = []
 parties = []
@@ -158,9 +134,7 @@ def should_freeze_score(check_name):
     return check_name in achieved_quorum and "(IND)" in check_name
 
 
-while len(achieved_quorum) + len(eliminated) < len(candidates):
-    print("\nRound " + str(round))
-    
+def tally_candidate_votes():
     for name in candidates:
         if not should_freeze_score(name):
             candidates[name] = 0
@@ -174,7 +148,12 @@ while len(achieved_quorum) + len(eliminated) < len(candidates):
             check_name = ballot_order[ballot_position]
             if not should_freeze_score(check_name):
                 candidates[check_name] += ballot_value
+
+
+while len(achieved_quorum) + len(eliminated) < len(candidates):
+    print("\nRound " + str(round))
     
+    tally_candidate_votes()
     achieved_quorum = {name: candidates[name] for name in candidates if name in achieved_quorum}
     
     print(candidates)
@@ -245,6 +224,9 @@ while len(achieved_quorum) + len(eliminated) < len(candidates):
         ballot["currpos"] = ballot_position
 
     round += 1
+else:
+    tally_candidate_votes()
+    achieved_quorum = {name: candidates[name] for name in candidates if name in achieved_quorum}
 
 
 # Tally votes by party
@@ -256,7 +238,7 @@ for name in achieved_quorum:
 
 # Result
 
-print("\nThe following candidates have been elected:")
+print("\nThe following candidates have achieved a quorum after transfers:")
 print(achieved_quorum)
 
 print("\n---\n")
@@ -278,8 +260,8 @@ print(str(seats_for_parties) + " seats are to be apportioned among the parties."
 round = 0
 while round < seats_for_parties:
     print("\nRound " + str(round))
-    print("Party Seats:" + str(party_seats))
-    print("Party Quotients:" + str(party_quotients))
+    print("Party Seats: " + str(party_seats))
+    print("Party Quotients: " + str(party_quotients))
     
     highest_quotient = 0
     highest_parties = []
