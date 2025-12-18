@@ -1,6 +1,7 @@
 import random as rand
 import copy
 
+from ballot import Ballot
 
 
 def backtrack_rounds(round, rounds, tied, votes_total):
@@ -78,12 +79,13 @@ def break_tie(round, rounds, tied, votes_total, num_candidates, preferences):
 
 SIZE = int(input("Please enter the number of seats: ")) # Number of Winners
 
+ballots: list[Ballot] = []
+
 myfile = open("input.txt") # Name (or path) of input file.
-ballots = myfile.read()
-ballots = ballots.split("\n")
-for i in range(len(ballots)):
-    ballots[i] = ballots[i][84:]
-    ballots[i] = ballots[i].split(", ")
+raw_ballots = myfile.read()
+raw_ballots = raw_ballots.split("\n")
+for ballot in raw_ballots:
+    ballots.append(Ballot(ballot[84:].split(", ")))
 
 candidates = []
 parties = []
@@ -93,16 +95,14 @@ eliminated = []
 
 # Initialising
 
-for i in range(len(ballots)):
-    for name in ballots[i]:
+for ballot in ballots:
+    for name in ballot.order:
         if name not in candidates:
             candidates.append(name)
             if "(" in name and ")" in name:
-                party = name[name.index("(") + 1:name.index(")")]
+                party = name[(name.index("(") + 1):name.index(")")]
                 if not party == "IND" and party not in parties:
                     parties.append(party)
-    
-    ballots[i] = {"currpos": 0, "currvalue": 1, "order": ballots[i]}
 
 
 candidates = {name: 0 for name in candidates}
@@ -110,9 +110,8 @@ parties = {party: 0 for party in parties}
 
 candidate_preferences = {name: [0] * len(candidates) for name in candidates}
 for ballot in ballots:
-    ballot_order = ballot["order"]
-    for position in range(len(ballot_order)):
-        name = ballot_order[position]
+    for position in range(len(ballot.order)):
+        name = ballot.order[position]
         candidate_preferences[name][position] += 1
 
 votes_total = len(ballots)
@@ -140,14 +139,9 @@ def tally_candidate_votes():
             candidates[name] = 0
     
     for ballot in ballots:
-        ballot_position = ballot["currpos"]
-        ballot_order = ballot["order"]
-        ballot_value = ballot["currvalue"]
-        
-        if not ballot_position == -1:
-            check_name = ballot_order[ballot_position]
-            if not should_freeze_score(check_name):
-                candidates[check_name] += ballot_value
+        if not ballot.exhausted():
+            if not should_freeze_score(ballot.attributed_name()):
+                candidates[ballot.attributed_name()] += ballot.value
 
 
 while len(achieved_quorum) + len(eliminated) < len(candidates):
@@ -176,12 +170,8 @@ while len(achieved_quorum) + len(eliminated) < len(candidates):
                     print(str(transfer_value * votes) + " votes are now transferred.")
 
                     for ballot in ballots:
-                        ballot_order = ballot["order"]
-                        ballot_position = ballot["currpos"]
-                        
-                        check_name = ballot_order[ballot_position]
-                        if check_name == name:
-                            ballot["currvalue"] *= transfer_value
+                        if ballot.attributed_name() == name:
+                            ballot.value *= transfer_value
     
     if not quota_this_round:
         least_votes = []
@@ -204,24 +194,7 @@ while len(achieved_quorum) + len(eliminated) < len(candidates):
             eliminated.append(resolved)
 
     for ballot in ballots:
-        ballot_order = ballot["order"]
-        ballot_position = ballot["currpos"]
-        
-        delta_pos = 0
-        check_name = ballot_order[ballot_position + delta_pos]
-        while (check_name in achieved_quorum and "(IND)" in check_name) or check_name in eliminated:
-            delta_pos += 1
-            if ballot_position + delta_pos >= len(ballot_order):
-                break
-
-            check_name = ballot_order[ballot_position + delta_pos]
-        
-        if ballot_position + delta_pos >= len(ballot_order):
-            ballot_position = -1
-        else:
-            ballot_position += delta_pos
-        
-        ballot["currpos"] = ballot_position
+        ballot.transfer(achieved_quorum, eliminated)
 
     round += 1
 else:
