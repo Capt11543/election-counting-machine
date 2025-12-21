@@ -9,7 +9,7 @@ class Ballot:
         return self.position == -1
     
     
-    def attributed_name(self):
+    def attributed_name(self) -> str | None:
         if self.exhausted():
             return None
         

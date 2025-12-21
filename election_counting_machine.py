@@ -1,7 +1,7 @@
 import random as rand
 import copy
 
-from ballot import Ballot
+import parser as Parser
 
 
 def lowest_scoring(tied: dict[str, int]) -> list[str]:
@@ -77,40 +77,14 @@ def break_tie(round: int, rounds: list[dict[str, float]], tied: list[str], votes
 
 SIZE = int(input("Please enter the number of seats: ")) # Number of Winners
 
-ballots: list[Ballot] = []
+filename = input("Please enter the path to the raw ballots: ")
+ballots, candidates, parties, candidate_preferences = Parser.parse_raw_ballots(filename)
 
-myfile = open("input.txt") # Name (or path) of input file.
-raw_ballots = myfile.read()
-raw_ballots = raw_ballots.split("\n")
-for ballot in raw_ballots:
-    ballots.append(Ballot(ballot[84:].split(", ")))
-
-candidates = []
-parties = []
 achieved_quorum = {}
 eliminated = []
 
-
-# Initialising
-
-for ballot in ballots:
-    for name in ballot.order:
-        if name not in candidates:
-            candidates.append(name)
-            if "(" in name and ")" in name:
-                party = name[(name.index("(") + 1):name.index(")")]
-                if not party == "IND" and party not in parties:
-                    parties.append(party)
-
-
 candidates = {name: 0 for name in candidates}
 parties = {party: 0 for party in parties}
-
-candidate_preferences = {name: [0] * len(candidates) for name in candidates}
-for ballot in ballots:
-    for position in range(len(ballot.order)):
-        name = ballot.order[position]
-        candidate_preferences[name][position] += 1
 
 votes_total = len(ballots)
 
