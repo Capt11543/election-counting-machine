@@ -29,3 +29,30 @@ def parse_raw_ballots(filename: str) -> tuple[list[Ballot], list[str], list[str]
             candidate_preferences[name][position] += 1
     
     return ballots, candidate_names, party_names, candidate_preferences
+
+
+def parse_party_lists(filename: str) -> dict[str, list[str]]:
+    party_lists: dict[str, list[str]] = {}
+
+    with open(filename, 'r') as myfile:
+        raw_lists = myfile.read()
+        raw_lists = raw_lists.split("\n")
+
+        for list in raw_lists:
+            parts = list.split(": ")
+            party = parts[0]
+            candidates = parts[1].split(", ")
+
+            party_lists[party] = candidates
+    
+    return party_lists
+
+
+def main():
+    lists_filename = input("Please enter the path to the party lists: ")
+    party_lists = parse_party_lists(lists_filename)
+    print(party_lists)
+
+
+if __name__ == "__main__":
+    main()
