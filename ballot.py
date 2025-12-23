@@ -31,3 +31,8 @@ class Ballot:
                 break
         
         self.position += delta_pos
+
+    
+    def __repr__(self):
+        # print JSON formatting of the ballot (position, value, order)
+        return f'{{"position": {self.position}, "value": {self.value}, "order": {self.order}}}'
