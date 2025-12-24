@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 
 class Candidate:
-    def get_from_list(name: str, list: list['Candidate']):
+    def get_from_list(name: str, list: list[Candidate]):
         if name is None:
             return None
 
@@ -17,6 +17,13 @@ class Candidate:
         if "(" in name and ")" in name:
             return name[(name.index("(") + 1):name.index(")")]
         return default
+    
+
+    def names_in_list(candidates: list[Candidate], include_party_affiliation = False, include_score = False):
+        if include_score:
+            return {candidate.name + ((" (" + candidate.party_affiliation + ")") if include_party_affiliation else ""): candidate.votes for candidate in candidates}
+        else:
+            return [candidate.name + ((" (" + candidate.party_affiliation + ")") if include_party_affiliation else "") for candidate in candidates]
 
     
     def __init__(self, name: str, party_affiliation: str, preferences: list[int]):

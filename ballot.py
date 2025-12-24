@@ -22,11 +22,11 @@ class Ballot:
         return self.order[self.position + delta_pos]
 
 
-    def _should_transfer(check_candidate: Candidate, achieved_quorum: list[Candidate], eliminated: list[Candidate]):
+    def _should_transfer(check_candidate: Candidate, achieved_quota: list[Candidate], eliminated: list[Candidate]):
         if check_candidate is None:
             return False
         
-        if check_candidate in achieved_quorum:
+        if check_candidate in achieved_quota:
             if check_candidate.party_affiliation == "IND":
                 return True
         
@@ -36,10 +36,10 @@ class Ballot:
         return False
     
     
-    def transfer(self, candidates: list[Candidate], achieved_quorum: list[Candidate], eliminated: list[Candidate], delta_pos = 0):
+    def transfer(self, candidates: list[Candidate], achieved_quota: list[Candidate], eliminated: list[Candidate], delta_pos = 0):
         check_candidate: Candidate | None = Candidate.get_from_list(self.attributed_name(delta_pos), candidates)
-        if Ballot._should_transfer(check_candidate, achieved_quorum, eliminated):
-            self.transfer(candidates, achieved_quorum, eliminated, delta_pos + 1)
+        if Ballot._should_transfer(check_candidate, achieved_quota, eliminated):
+            self.transfer(candidates, achieved_quota, eliminated, delta_pos + 1)
         else:
             self.position += delta_pos
             if self.position >= len(self.order):
