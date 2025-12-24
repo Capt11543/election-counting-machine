@@ -40,7 +40,7 @@ def parse_raw_ballots(filename: str, include_party_affiliation = True, party_nam
     
     candidates: list[Candidate] = []
     for name in candidate_names:
-        candidates.append(Candidate(name[:name.index("(")], choose_party_affiliation(name, include_party_affiliation, party_names), candidate_preferences[name]))
+        candidates.append(Candidate(name[:name.index("(") - 1], choose_party_affiliation(name, include_party_affiliation, party_names), candidate_preferences[name]))
     
     return ballots, candidates, party_names
 

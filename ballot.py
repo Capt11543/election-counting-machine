@@ -1,3 +1,6 @@
+from candidate import Candidate
+
+
 class Ballot:
     def __init__(self, order: list[int]):
         self.position = 0
@@ -9,28 +12,43 @@ class Ballot:
         return self.position == -1
     
     
-    def attributed_name(self) -> str | None:
+    def attributed_name(self, delta_pos = 0) -> str | None:
         if self.exhausted():
             return None
         
-        return self.order[self.position]
-
-
-    def _check_name(self, delta_pos: int):
+        if self.position + delta_pos >= len(self.order):
+            return None
+        
         return self.order[self.position + delta_pos]
 
 
-    def transfer(self, achieved_quorum: dict[str, float], eliminated: list[str]):
-        delta_pos = 0
-
-        while (self._check_name(delta_pos) in achieved_quorum and "(IND)" in self._check_name(delta_pos)) or self._check_name(delta_pos) in eliminated:
-            delta_pos += 1
-
-            if self.position + delta_pos >= len(self.order):
-                self.position = -1
-                break
+    def _should_transfer(check_candidate: Candidate, achieved_quorum: list[Candidate], eliminated: list[Candidate]):
+        if check_candidate is None:
+            return False
         
-        self.position += delta_pos
+        if check_candidate in achieved_quorum:
+            if check_candidate.party_affiliation == "IND":
+                return True
+        
+        if check_candidate in eliminated:
+            return True
+        
+        return False
+    
+    
+    def transfer(self, candidates: list[Candidate], achieved_quorum: list[Candidate], eliminated: list[Candidate], delta_pos = 0):
+        check_candidate: Candidate | None = Candidate.get_from_list(self.attributed_name(delta_pos), candidates)
+        if Ballot._should_transfer(check_candidate, achieved_quorum, eliminated):
+            self.transfer(candidates, achieved_quorum, eliminated, delta_pos + 1)
+        else:
+            self.position += delta_pos
+            if self.position >= len(self.order):
+                self.position = -1
+    
+
+    def reweight(self, votes: int, threshold: float):
+        transfer_value = (votes - threshold) / votes
+        self.value *= transfer_value
 
     
     def __repr__(self):
