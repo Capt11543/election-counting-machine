@@ -2,6 +2,7 @@ from candidate import Candidate
 import parser as Parser
 import stv as STV
 import seat_allocation as SeatAllocation
+import seat_election as SeatElection
 
 import random
 
@@ -24,26 +25,7 @@ print("\n---\n")
 
 SeatAllocation.run(parties, SIZE, achieved_quota)
 
-
-elected: list[Candidate] = []
-
-for candidate in achieved_quota:
-    if candidate.party_affiliation == "IND" and candidate not in elected:
-        elected.append(candidate)
-
-for party in parties:
-    for _ in range(party.seats):
-        for candidate in achieved_quota:
-            if candidate.party_affiliation == party.name and candidate not in elected:
-                elected.append(candidate)
-                break
-        else:
-            for candidate in reversed(eliminated):
-                if candidate.party_affiliation == party.name and candidate not in elected:
-                    elected.append(candidate)
-                    break
-            else:
-                elected.append(Candidate("VACANT", party.name, []))
+elected = SeatElection.run(parties, achieved_quota, eliminated, True)
 
 print("\nThe following candidates have been elected to Parliament:")
 print(Candidate.names_in_list(elected, True, False))

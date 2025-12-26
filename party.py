@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from candidate import Candidate
+
 
 class Party:
     def __init__(self, name: str, candidate_list: list[str]):
@@ -24,6 +26,18 @@ class Party:
             return None
 
         return next((party for party in list if name.startswith(party.name)), None)
+    
+
+    def infer_candidate_list(self, achieved_quota: list[Candidate], eliminated: list[Candidate]):
+        quota_candidates = [candidate for candidate in achieved_quota if candidate.party_affiliation == self.name]
+        ordered_quota_candidates = sorted(quota_candidates, key=lambda x: x.votes, reverse=True)
+        
+        for candidate in ordered_quota_candidates:
+            self.candidate_list.append(candidate)
+        
+        for candidate in reversed(eliminated):
+            if candidate.party_affiliation == self.name:
+                self.candidate_list.append(candidate)
     
 
     def __repr__(self):
