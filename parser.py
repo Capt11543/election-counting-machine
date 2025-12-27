@@ -3,7 +3,7 @@ from candidate import Candidate
 from party import Party
 
 
-def choose_party_affiliation(name: str, include_party_affiliation, party_names: list[str]):
+def _choose_party_affiliation(name: str, include_party_affiliation, party_names: list[str]):
     if not include_party_affiliation:
         return None
     
@@ -11,7 +11,9 @@ def choose_party_affiliation(name: str, include_party_affiliation, party_names: 
     return check_name if check_name in party_names else "IND"
 
 
-def parse_raw_ballots(filename: str, party_lists: dict[str, list[str]] = {}, include_party_affiliation = True) -> tuple[list[Ballot], list[Candidate], list[Party]]:
+def parse_raw_ballots(party_lists: dict[str, list[str]] = {}, include_party_affiliation = True, parties_are_candidates = False) -> tuple[list[Ballot], list[Candidate], list[Party]]:
+    filename = input("Please input the path to the ballots: ")
+
     party_names = [*party_lists]
     
     ballots: list[Ballot] = []
@@ -43,7 +45,7 @@ def parse_raw_ballots(filename: str, party_lists: dict[str, list[str]] = {}, inc
     
     candidates: list[Candidate] = []
     for name in candidate_names:
-        candidates.append(Candidate(name[:name.index("(") - 1], choose_party_affiliation(name, include_party_affiliation, party_names), candidate_preferences[name]))
+        candidates.append(Candidate(name[:name.index("(") - 1], _choose_party_affiliation(name, include_party_affiliation, party_names), candidate_preferences[name]))
     
     parties: list[Party] = []
     for name in party_names:
@@ -52,7 +54,9 @@ def parse_raw_ballots(filename: str, party_lists: dict[str, list[str]] = {}, inc
     return ballots, candidates, parties
 
 
-def parse_party_lists(filename: str) -> dict[str, list[str]]:
+def parse_party_lists() -> dict[str, list[str]]:
+    filename = input("Please input the path to the party lists: ")
+
     party_lists: dict[str, list[str]] = {}
 
     with open(filename, 'r') as myfile:

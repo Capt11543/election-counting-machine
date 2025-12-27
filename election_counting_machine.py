@@ -10,23 +10,22 @@ import random
 
 def main():
     # Get input from the user
-    SIZE = int(input("Please enter the number of seats: ")) # Number of Winners
-    filename = input("Please enter the path to the raw ballots: ")
+    total_seats = int(input("Please enter the number of seats: ")) # Number of Winners
     seed = int(input("Please provide with a seed: "))
     random.seed(seed)
 
     # Parse ballots
-    ballots, candidates, parties = Parser.parse_raw_ballots(filename)
+    party_lists = Parser.parse_party_lists()
+    ballots, candidates, parties = Parser.parse_raw_ballots(party_lists)
 
     # Run the STV process
-    achieved_quota, eliminated = STV.run(SIZE, ballots, candidates)
+    achieved_quota, eliminated = STV.run(total_seats, ballots, candidates)
     print("\nThe following candidates have achieved a quota after transfers: ")
     print(Candidate.names_in_list(achieved_quota, False, True))
 
     print("\n---\n")
 
-    SeatAllocation.run(parties, SIZE, achieved_quota)
-
+    SeatAllocation.run(parties, total_seats, achieved_quota)
     print("\nThe parties have been apportioned the following number of seats:")
     print(Party.names_in_list(parties, 2))
 
