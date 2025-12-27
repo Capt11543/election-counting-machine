@@ -1,4 +1,5 @@
 from candidate import Candidate
+from party import Party
 import parser as Parser
 import stv as STV
 import seat_allocation as SeatAllocation
@@ -25,6 +26,11 @@ def main():
     print("\n---\n")
 
     SeatAllocation.run(parties, SIZE, achieved_quota)
+
+    print("\nThe parties have been apportioned the following number of seats:")
+    print(Party.names_in_list(parties, 2))
+
+    print("\n---\n")
 
     elected = SeatElection.run(parties, achieved_quota, eliminated, True)
 

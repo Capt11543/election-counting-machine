@@ -50,6 +50,3 @@ def run(parties: list[Party], total_seats: int, achieved_quota: list[Candidate])
         highest_party.seats += 1
 
         round += 1
-    else:
-        print("\nThe parties have been apportioned the following number of seats:")
-        print(Party.names_in_list(parties, 2))
