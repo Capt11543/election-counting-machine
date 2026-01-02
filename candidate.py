@@ -13,10 +13,24 @@ class Candidate:
         return next((candidate for candidate in list if name.startswith(candidate.name)), None)
     
 
-    def find_party_affiliation(name: str, default="IND") -> str:
+    def find_party_affiliation(name: str, parties_are_candidates=False, default="IND") -> str:
+        if parties_are_candidates:
+            return name
+        
         if "(" in name and ")" in name:
             return name[(name.index("(") + 1):name.index(")")]
         return default
+    
+
+    def strip_party_affiliation(name: str):
+        result = ""
+
+        try:
+            result = name[:name.index("(") - 1]
+        except ValueError:
+            result = name
+        finally:
+            return result
     
 
     def names_in_list(candidates: list[Candidate], include_party_affiliation = False, include_score = False):

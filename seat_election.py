@@ -16,6 +16,11 @@ def run(parties: list[Party], achieved_quota: list[Candidate], eliminated: list[
             if index >= len(party.candidate_list):
                 elected.append(Candidate("VACANT", party.name, []))
             else:
-                elected.append(party.candidate_list[index])
+                newly_elected = party.candidate_list[index]
+
+                if infer_candidate_lists:
+                    elected.append(newly_elected)
+                else:
+                    elected.append(Candidate(newly_elected, newly_elected, []))
 
     return elected

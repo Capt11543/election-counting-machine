@@ -16,7 +16,7 @@ def main():
 
     # Parse ballots
     party_lists = Parser.parse_party_lists()
-    ballots, candidates, parties = Parser.parse_raw_ballots(party_lists)
+    ballots, candidates, parties = Parser.parse_ballots(party_lists, True, True)
 
     # Run the STV process
     achieved_quota, eliminated = STV.run(total_seats, ballots, candidates)
@@ -31,7 +31,7 @@ def main():
 
     print("\n---\n")
 
-    elected = SeatElection.run(parties, achieved_quota, eliminated, True)
+    elected = SeatElection.run(parties, achieved_quota, eliminated, False)
 
     print("\nThe following candidates have been elected to Parliament:")
     print(Candidate.names_in_list(elected, True, False))

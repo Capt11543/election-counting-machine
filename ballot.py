@@ -2,7 +2,7 @@ from candidate import Candidate
 
 
 class Ballot:
-    def __init__(self, order: list[int]):
+    def __init__(self, order: list[str]):
         self.position = 0
         self.value = 1
         self.order = order
