@@ -7,16 +7,16 @@ import copy
 from ballot import Ballot
 
 
-def _should_freeze_score(check_candidate: Candidate, achieved_quota: list[Candidate]):
+def _should_freeze_score(check_candidate: Candidate, achieved_quota: list[Candidate], is_special_election: bool):
     if check_candidate in achieved_quota:
-        if check_candidate.party_affiliation == "IND":
+        if check_candidate.party_affiliation == "IND" or is_special_election:
             return True
     return False
 
 
-def _tally_candidate_votes(candidates: list[Candidate], ballots: list[Ballot], achieved_quota: list[Candidate]):
+def _tally_candidate_votes(candidates: list[Candidate], ballots: list[Ballot], achieved_quota: list[Candidate], is_special_election: bool):
     for candidate in candidates:
-        candidate.tally_votes(ballots, _should_freeze_score(candidate, achieved_quota))
+        candidate.tally_votes(ballots, _should_freeze_score(candidate, achieved_quota, is_special_election))
 
 
 def _save_round(rounds: list[list[Candidate]], this_round: list[Candidate]):
@@ -24,8 +24,8 @@ def _save_round(rounds: list[list[Candidate]], this_round: list[Candidate]):
     rounds.append(temp)
 
 
-def _reweight_ballots(threshold: float, candidate: Candidate, ballots: list[Ballot]):
-    if not candidate.party_affiliation == "IND":
+def _reweight_ballots(threshold: float, candidate: Candidate, ballots: list[Ballot], is_special_election: bool):
+    if not is_special_election and not candidate.party_affiliation == "IND":
         return
 
     print(f"{str(candidate.votes - threshold)} votes are now transferred.")
@@ -38,7 +38,7 @@ def _reweight_ballots(threshold: float, candidate: Candidate, ballots: list[Ball
             ballot.reweight(candidate.votes, threshold)
 
 
-def _award_quotas(threshold: float, candidates: list[Candidate], ballots: list[Ballot], achieved_quota: list[Candidate]):
+def _award_quotas(threshold: float, candidates: list[Candidate], ballots: list[Ballot], achieved_quota: list[Candidate], is_special_election: bool):
     awarded_quota = False
     for candidate in candidates:
         if candidate.votes >= threshold:
@@ -48,7 +48,7 @@ def _award_quotas(threshold: float, candidates: list[Candidate], ballots: list[B
                 awarded_quota = True
                 print(f"{candidate.name} has been elected with {candidate.votes} / {threshold} votes.")
 
-                _reweight_ballots(threshold, candidate, ballots)
+                _reweight_ballots(threshold, candidate, ballots, is_special_election)
     
     return awarded_quota
 
@@ -80,12 +80,12 @@ def _eliminate_lowest_scorer(in_contention: list[Candidate], round: int, rounds:
     return eliminated_candidate
 
 
-def _transfer_ballots(ballots: list[Ballot], candidates: list[Candidate], achieved_quota: list[Candidate], eliminated: list[Candidate]):
+def _transfer_ballots(ballots: list[Ballot], candidates: list[Candidate], achieved_quota: list[Candidate], eliminated: list[Candidate], is_special_election: bool):
     for ballot in ballots:
-        ballot.transfer(candidates, achieved_quota, eliminated)
+        ballot.transfer(candidates, achieved_quota, eliminated, is_special_election)
 
 
-def run(total_seats: int, ballots: list[Ballot], candidates: list[Candidate]):
+def run(total_seats: int, ballots: list[Ballot], candidates: list[Candidate], is_special_election: bool):
     total_votes = len(ballots)
     threshold = total_votes / total_seats
     print("Threshold to achieve quota: " + str(threshold))
@@ -97,20 +97,28 @@ def run(total_seats: int, ballots: list[Ballot], candidates: list[Candidate]):
     rounds: list[list[Candidate]] = []
     while len(achieved_quota) + len(eliminated) < len(candidates):
         print("\nRound " + str(round))
-        _tally_candidate_votes(candidates, ballots, achieved_quota)
+        _tally_candidate_votes(candidates, ballots, achieved_quota, is_special_election)
         print(Candidate.names_in_list(candidates, False, True))
         _save_round(rounds, candidates)
+
+        in_contention = [candidate for candidate in candidates if candidate not in achieved_quota and candidate not in eliminated]
         
-        awarded_quota = _award_quotas(threshold, candidates, ballots, achieved_quota)
+        if is_special_election:
+            if len(in_contention) <= total_seats - len(achieved_quota):
+                print("There are as many unfilled seats as candidates remaining in contention.  The following candidates are elected:")
+                print(Candidate.names_in_list(in_contention, False, True))
+                achieved_quota.extend(in_contention)
+                continue
+        
+        awarded_quota = _award_quotas(threshold, candidates, ballots, achieved_quota, is_special_election)
         if not awarded_quota:
-            in_contention = [candidate for candidate in candidates if candidate not in achieved_quota and candidate not in eliminated]
             eliminated.append(_eliminate_lowest_scorer(in_contention, round, rounds, len(candidates)))
         
-        _transfer_ballots(ballots, candidates, achieved_quota, eliminated)
+        _transfer_ballots(ballots, candidates, achieved_quota, eliminated, is_special_election)
 
         round += 1
     else:
-        _tally_candidate_votes(candidates, ballots, achieved_quota)
+        _tally_candidate_votes(candidates, ballots, achieved_quota, is_special_election)
     
     return achieved_quota, eliminated
 
