@@ -33,16 +33,16 @@ class Candidate:
             return result
     
 
-    def names_in_list(candidates: list[Candidate], include_party_affiliation = False, include_score = False):
+    def names_in_list(candidates: list[Candidate], include_party_affiliation = False, include_score = False, preference_level = -1):
         if include_score:
-            return {candidate.name + ((" (" + candidate.party_affiliation + ")") if include_party_affiliation else ""): candidate.votes for candidate in candidates}
+            return {candidate.name + ((" (" + candidate.party_affiliation + ")") if include_party_affiliation else ""): candidate.preferences[preference_level] if preference_level > -1 else candidate.votes for candidate in candidates}
         else:
             return [candidate.name + ((" (" + candidate.party_affiliation + ")") if include_party_affiliation else "") for candidate in candidates]
 
     
     def __init__(self, name: str, party_affiliation: str, preferences: list[int]):
         self.name = name
-        self.votes = 0
+        self.votes = 0.0
         self.party_affiliation = party_affiliation
         self.preferences = preferences
     
@@ -51,7 +51,7 @@ class Candidate:
         if should_freeze_score:
             return
         
-        self.votes = 0
+        self.votes = 0.0
         for ballot in ballots:
             if not ballot.exhausted():
                 if ballot.attributed_name().startswith(self.name):

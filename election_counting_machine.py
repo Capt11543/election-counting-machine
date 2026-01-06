@@ -9,6 +9,9 @@ import random
 
 
 def main():
+    parties_are_candidates = True
+    simulate_new_system = True and parties_are_candidates
+
     # Get input from the user
     total_seats = int(input("Please enter the number of seats: ")) # Number of Winners
     seed = int(input("Please provide with a seed: "))
@@ -25,15 +28,15 @@ def main():
 
     print("\n---\n")
 
-    SeatAllocation.run(parties, total_seats, achieved_quota)
+    SeatAllocation.run(parties, total_seats, achieved_quota, len(candidates), parties_are_candidates)
     print("\nThe parties have been apportioned the following number of seats:")
     print(Party.names_in_list(parties, 2))
 
     print("\n---\n")
 
-    elected = SeatElection.run(parties, achieved_quota, eliminated, False)
+    elected = SeatElection.run(parties, achieved_quota, eliminated, not parties_are_candidates)
 
-    print("\nThe following candidates have been elected to Parliament:")
+    print("The following candidates have been elected to Parliament:")
     print(Candidate.names_in_list(elected, True, False))
     print("Congratulations to the elected candidates!  Thank you for voting!")
 

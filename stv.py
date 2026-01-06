@@ -66,15 +66,15 @@ def _break_tie(tied: list[Candidate], round: int, rounds: list[list[Candidate]],
 
 
 def _eliminate_lowest_scorer(in_contention: list[Candidate], round: int, rounds: list[list[Candidate]], num_candidates: int):
-    lowest_scorer_list: list[Candidate] = Tiebreak.lowest_scorer(in_contention)
+    lowest_scorers: list[Candidate] = Tiebreak.lowest_candidate(in_contention)
     eliminated_candidate: Candidate = None
     
-    if lowest_scorer_list is not None:
-        if len(lowest_scorer_list) == 1:
-            eliminated_candidate = lowest_scorer_list[0]
+    if lowest_scorers is not None:
+        if len(lowest_scorers) == 1:
+            eliminated_candidate = lowest_scorers[0]
         else:
-            print("A tie has to be broken between: " + str(Candidate.names_in_list(lowest_scorer_list, False, True)))
-            eliminated_candidate = _break_tie(lowest_scorer_list, round, rounds, num_candidates)
+            print("A tie has to be broken between: " + str(Candidate.names_in_list(lowest_scorers, False, True)))
+            eliminated_candidate = _break_tie(lowest_scorers, round, rounds, num_candidates)
     
     print(eliminated_candidate.name + " has been eliminated with " + str(eliminated_candidate.votes) + " votes.")
     return eliminated_candidate
@@ -92,7 +92,6 @@ def run(total_seats: int, ballots: list[Ballot], candidates: list[Candidate]):
 
     achieved_quota: list[Candidate] = []
     eliminated: list[Candidate] = []
-
 
     round = 0
     rounds: list[list[Candidate]] = []

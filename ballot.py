@@ -4,7 +4,7 @@ from candidate import Candidate
 class Ballot:
     def __init__(self, order: list[str]):
         self.position = 0
-        self.value = 1
+        self.value = 1.0
         self.order = order
     
 

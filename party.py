@@ -6,7 +6,7 @@ from candidate import Candidate
 class Party:
     def __init__(self, name: str, candidate_list: list[str]):
         self.name = name
-        self.votes = 0
+        self.votes = 0.0
         self.seats = 0
         self.candidate_list = candidate_list
     
