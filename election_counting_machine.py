@@ -8,13 +8,27 @@ import seat_election as SeatElection
 import random
 
 
+def input_integer(message: str):
+    result = 0
+
+    no_problem = False
+    while not no_problem:
+        no_problem = True
+
+        try:
+            result = int(input(message))
+        except ValueError:
+            print("Please enter a valid integer.")
+            no_problem = False
+
+
 def main():
     parties_are_candidates = False
     simulate_new_system = True and parties_are_candidates
 
     # Get input from the user
-    total_seats = int(input("Please enter the number of seats: ")) # Number of Winners
-    seed = int(input("Please provide with a seed: "))
+    total_seats = input_integer("Please enter the number of seats: ") # Number of Winners
+    seed = input_integer("Please provide with a seed: ")
     random.seed(seed)
 
     # Parse ballots
