@@ -75,9 +75,13 @@ def compare_preferences(tied: list[Candidate], num_candidates: int, highest=Fals
             print("Tie broken after comparing " + ordinal_str + "-choice votes.")
             return lowest_scoring[0]
         
+        no_longer_tied = []
         for candidate in tied:
             if candidate not in lowest_scoring:
                 print(candidate.name + " is no longer tied.")
-                tied.remove(candidate)
+                no_longer_tied.append(candidate)
+        
+        for candidate in no_longer_tied:
+            tied.remove(candidate)
     
     return None

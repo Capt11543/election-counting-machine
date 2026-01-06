@@ -115,7 +115,6 @@ def run(total_seats: int, ballots: list[Ballot], candidates: list[Candidate]):
     return achieved_quota, eliminated
 
 
-
 def main():
     pass
 

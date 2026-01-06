@@ -93,7 +93,7 @@ def _construct_final_lists(candidate_names: list[str], party_names: list[str], p
     return candidates, parties
 
 
-def parse_ballots(party_lists: dict[str, list[str]] = {}, parties_are_candidates=False, simulate_new_system=False) -> tuple[list[Ballot], list[Candidate], list[Party]]:
+def parse_ballots(party_lists: dict[str, list[str]], parties_are_candidates=False, simulate_new_system=False) -> tuple[list[Ballot], list[Candidate], list[Party]]:
     filename = input("Please input the path to the ballots: ")
     
     ballots = _parse_raw_ballots(filename, simulate_new_system, party_lists)

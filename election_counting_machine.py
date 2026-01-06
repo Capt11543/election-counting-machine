@@ -9,7 +9,7 @@ import random
 
 
 def main():
-    parties_are_candidates = True
+    parties_are_candidates = False
     simulate_new_system = True and parties_are_candidates
 
     # Get input from the user
@@ -18,8 +18,10 @@ def main():
     random.seed(seed)
 
     # Parse ballots
-    party_lists = Parser.parse_party_lists()
-    ballots, candidates, parties = Parser.parse_ballots(party_lists, True, True)
+    party_lists = {}
+    if simulate_new_system:
+        party_lists = Parser.parse_party_lists()
+    ballots, candidates, parties = Parser.parse_ballots(party_lists, parties_are_candidates, simulate_new_system)
 
     # Run the STV process
     achieved_quota, eliminated = STV.run(total_seats, ballots, candidates)
