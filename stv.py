@@ -2,9 +2,16 @@ import tiebreak as Tiebreak
 from candidate import Candidate
 import random
 import copy
+from decimal import *
 
 # only needed for type checking
 from ballot import Ballot
+
+
+def _calculate_threshold(total_votes: int, total_seats: int):
+    result = Decimal(total_votes / total_seats)
+    result = result.quantize(Decimal('1.00000'))
+    return result
 
 
 def _should_freeze_score(check_candidate: Candidate, achieved_quota: list[Candidate], is_special_election: bool):
@@ -87,7 +94,7 @@ def _transfer_ballots(ballots: list[Ballot], candidates: list[Candidate], achiev
 
 def run(total_seats: int, ballots: list[Ballot], candidates: list[Candidate], is_special_election: bool):
     total_votes = len(ballots)
-    threshold = total_votes / total_seats
+    threshold = _calculate_threshold(total_votes, total_seats)
     print("Threshold to achieve quota: " + str(threshold))
 
     achieved_quota: list[Candidate] = []

@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ballot import Ballot
 
+from decimal import *
+
 
 class Candidate:
     def get_from_list(name: str, list: list[Candidate]):
@@ -35,14 +37,14 @@ class Candidate:
 
     def names_in_list(candidates: list[Candidate], include_party_affiliation = False, include_score = False, preference_level = -1):
         if include_score:
-            return {candidate.name + ((" (" + candidate.party_affiliation + ")") if include_party_affiliation else ""): candidate.preferences[preference_level] if preference_level > -1 else candidate.votes for candidate in candidates}
+            return {candidate.name + ((" (" + candidate.party_affiliation + ")") if include_party_affiliation else ""): candidate.preferences[preference_level] if preference_level > -1 else str(candidate.votes) for candidate in candidates}
         else:
             return [candidate.name + ((" (" + candidate.party_affiliation + ")") if include_party_affiliation else "") for candidate in candidates]
 
     
     def __init__(self, name: str, party_affiliation: str, preferences: list[int]):
         self.name = name
-        self.votes = 0.0
+        self.votes = Decimal(0.00000)
         self.party_affiliation = party_affiliation
         self.preferences = preferences
     
@@ -51,11 +53,13 @@ class Candidate:
         if should_freeze_score:
             return
         
-        self.votes = 0.0
+        self.votes = Decimal(0.00000)
         for ballot in ballots:
             if not ballot.exhausted():
                 if ballot.attributed_name().startswith(self.name):
                     self.votes += ballot.value
+        
+        self.votes = self.votes.quantize(Decimal('1.00000'))
     
     
     def __repr__(self):

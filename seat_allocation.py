@@ -35,9 +35,9 @@ def _break_tie(tied_parties: list[Party], achieved_quota: list[Candidate], num_c
 
 
 def _find_highest_party(parties: list[Party], achieved_quota: list[Candidate], num_candidates: int, parties_are_candidates: bool):
-    party_quotients = {party: party.votes / (2 * party.seats + 1) for party in parties}
+    party_quotients = {party: party.get_quotient() for party in parties}
     print("Party Quotients:")
-    print({party.name: party_quotients[party] for party in party_quotients})
+    print({party.name: str(party_quotients[party]) for party in party_quotients})
 
     highest_party = Tiebreak.highest_party(party_quotients)
     
@@ -49,7 +49,7 @@ def _find_highest_party(parties: list[Party], achieved_quota: list[Candidate], n
 
 def run(parties: list[Party], total_seats: int, achieved_quota: list[Candidate], num_candidates: int, parties_are_candidates=False):
     for party in parties:
-        party.votes = sum([candidate.votes for candidate in achieved_quota if candidate.party_affiliation == party.name])
+        party.tally_votes(achieved_quota)
 
     print("The number of votes won by each party is shown below: ")
     print(Party.names_in_list(parties, 1))

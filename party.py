@@ -1,24 +1,27 @@
 from __future__ import annotations
 
 from candidate import Candidate
+from decimal import *
 
 
 class Party:
     def __init__(self, name: str, candidate_list: list[str]):
         self.name = name
-        self.votes = 0.0
+        self.votes = Decimal(0.00000)
         self.seats = 0
         self.candidate_list = candidate_list
     
 
     def names_in_list(parties: list[Party], mode=0):
         match mode:
+            case 0:
+                return [party.name for party in parties]
             case 1:
-                return {party.name: party.votes for party in parties}
+                return {party.name: str(party.votes) for party in parties}
             case 2:
                 return {party.name: party.seats for party in parties}
             case _:
-                return [party.name for party in parties]
+                raise ValueError("Invalid mode for names_in_list. Valid modes are 0 (names only), 1 (include votes), and 2 (include seats).")
     
 
     def get_from_list(name: str, list: list[Party]):
@@ -38,6 +41,17 @@ class Party:
         for candidate in reversed(eliminated):
             if candidate.party_affiliation == self.name:
                 self.candidate_list.append(candidate)
+    
+
+    def tally_votes(self, achieved_quota: list[Candidate]):
+        self.votes = Decimal(sum([candidate.votes for candidate in achieved_quota if candidate.party_affiliation == self.name]))
+        self.votes = self.votes.quantize(Decimal('1.00000'))
+    
+
+    def get_quotient(self):
+        result = self.votes / Decimal(2 * self.seats + 1)
+        result = result.quantize(Decimal('1.00000'))
+        return result
     
 
     def __repr__(self):

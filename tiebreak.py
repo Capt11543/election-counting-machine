@@ -1,11 +1,12 @@
 from candidate import Candidate
 from party import Party
 from typing import Any
+from decimal import *
 
 
 def _find_extreme_scorers(compare_objects: dict[Any, float], highest=False):
     extreme_scorers = []
-    extreme_score = -1 if highest else sum(compare_objects.values())
+    extreme_score = Decimal(-1.00000) if highest else sum(compare_objects.values())
 
     for object, score in compare_objects.items():
         condition = score > extreme_score if highest else score < extreme_score
@@ -30,7 +31,7 @@ def _is_quotient_dict(parties: list[Party] | dict[Party, float]):
     if not isinstance(parties, dict):
         return False
     
-    return all(isinstance(key, Party) and isinstance(value, float) for key, value in parties.items())
+    return all(isinstance(key, Party) and isinstance(value, Decimal) for key, value in parties.items())
 
 
 def highest_party(parties: list[Party] | dict[Party, float]) -> list[Party]:
@@ -65,7 +66,7 @@ def backtrack_rounds(tied: list[Candidate], round: int, rounds: list[list[Candid
 def compare_preferences(tied: list[Candidate], num_candidates: int, highest=False):
     for preference in range(num_candidates):
         ordinal_num = preference + 1
-        ordinal_str = str(ordinal_num) + ("st" if (ordinal_num) % 10 == 1 and not (ordinal_num) / 10 == 1 else "nd" if (ordinal_num) % 10 == 2 and not (ordinal_num) / 10 == 1 else "rd" if (ordinal_num) % 10 == 3 and not (ordinal_num) / 10 == 1 else "th")
+        ordinal_str = str(ordinal_num) + ("st" if (ordinal_num) % 10 == 1 and not (ordinal_num) // 10 == 1 else "nd" if (ordinal_num) % 10 == 2 and not (ordinal_num) // 10 == 1 else "rd" if (ordinal_num) % 10 == 3 and not (ordinal_num) // 10 == 1 else "th")
 
         print("Comparing " + ordinal_str + "-choice votes...")
         print(Candidate.names_in_list(tied, False, True, preference))

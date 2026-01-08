@@ -1,10 +1,11 @@
 from candidate import Candidate
+from decimal import *
 
 
 class Ballot:
     def __init__(self, order: list[str]):
         self.position = 0
-        self.value = 1.0
+        self.value = Decimal(1.00000)
         self.order = order
     
 
@@ -44,11 +45,17 @@ class Ballot:
             self.position += delta_pos
             if self.position >= len(self.order):
                 self.position = -1
+                return
+            
+            if delta_pos > 0:
+                print(f"{str(self.value)} votes to {self.attributed_name()}.")
     
 
     def reweight(self, votes: int, threshold: float):
-        transfer_value = (votes - threshold) / votes
+        transfer_value = Decimal((votes - threshold) / votes)
         self.value *= transfer_value
+        self.value = self.value.quantize(Decimal('1.00000'))
+
 
     
     def __repr__(self):
