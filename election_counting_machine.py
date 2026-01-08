@@ -60,7 +60,7 @@ def main():
 
     # Parse ballots
     party_lists = {}
-    if simulate_new_system:
+    if parties_are_candidates:
         party_lists = Parser.parse_party_lists()
     ballots, candidates, parties = Parser.parse_ballots(party_lists, parties_are_candidates, simulate_new_system)
 
