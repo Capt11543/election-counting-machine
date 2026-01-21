@@ -25,9 +25,6 @@ def _convert_to_hypothetical(raw_order: list[str], party_names: list[str]):
 
 
 def _parse_raw_ballots(filename: str, simulate_new_system: bool, party_names=None):
-    if simulate_new_system and party_names is None:
-        raise ValueError("party_names cannot be None if simulate_new_system is True")
-
     ballots: list[Ballot] = []
     with open(filename, 'r') as myfile:
         raw_ballots = myfile.read()
@@ -35,10 +32,6 @@ def _parse_raw_ballots(filename: str, simulate_new_system: bool, party_names=Non
 
         for ballot in raw_ballots:
             raw_order = ballot[84:].split(", ")
-
-            if simulate_new_system:
-                raw_order = _convert_to_hypothetical(raw_order, party_names)
-
             ballots.append(Ballot(raw_order))
     
     return ballots
@@ -93,10 +86,10 @@ def _construct_final_lists(candidate_names: list[str], party_names: list[str], p
     return candidates, parties
 
 
-def parse_ballots(party_lists: dict[str, list[str]], parties_are_candidates=False, simulate_new_system=False) -> tuple[list[Ballot], list[Candidate], list[Party]]:
+def parse_ballots(party_lists: dict[str, list[str]], parties_are_candidates=False) -> tuple[list[Ballot], list[Candidate], list[Party]]:
     filename = input("Please input the path to the ballots: ")
     
-    ballots = _parse_raw_ballots(filename, simulate_new_system, party_lists)
+    ballots = _parse_raw_ballots(filename, party_lists)
     
     candidate_names, party_names = _parse_candidate_names(ballots, party_lists, parties_are_candidates)
     candidate_preferences = _parse_candidate_preferences(ballots, candidate_names)
