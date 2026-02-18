@@ -54,6 +54,11 @@ class Party:
         return result
     
 
+    def set_votes(self, votes: int):
+        self.votes = Decimal(votes)
+        self.votes = self.votes.quantize(Decimal('1.00000'))
+    
+
     def __repr__(self):
         # print JSON formatting of the paty (name, votes, seats, candidate_list)
         return f'{{"name": "{self.name}", "votes": {self.votes}, "seats": "{self.seats}", "candidate_list": {self.candidate_list}}}'
