@@ -1,6 +1,7 @@
 from ballot import Ballot
 from candidate import Candidate
 from party import Party
+import json as JSON
 
 
 def _convert_to_hypothetical(raw_order: list[str], party_names: list[str]):
@@ -27,11 +28,10 @@ def _convert_to_hypothetical(raw_order: list[str], party_names: list[str]):
 def _parse_raw_ballots(filename: str, simulate_new_system: bool, party_names=None):
     ballots: list[Ballot] = []
     with open(filename, 'r') as myfile:
-        raw_ballots = myfile.read()
-        raw_ballots = raw_ballots.split("\n")
+        ballot_file_json = JSON.load(myfile)
 
-        for ballot in raw_ballots:
-            raw_order = ballot[84:].split(", ")
+        raw_orders = ballot_file_json['ballots']
+        for raw_order in raw_orders:
             ballots.append(Ballot(raw_order))
     
     return ballots

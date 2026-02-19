@@ -21,6 +21,7 @@ class Candidate:
         
         if "(" in name and ")" in name:
             return name[(name.index("(") + 1):name.index(")")]
+        
         return default
     
 
