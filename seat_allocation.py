@@ -40,7 +40,7 @@ def _break_tie(tied_parties: list[Party], achieved_quota: list[Candidate], num_c
 def _find_highest_party(parties: list[Party], achieved_quota: list[Candidate], num_candidates: int, parties_are_candidates: bool):
     party_quotients = {party: party.get_quotient() for party in parties}
     Logger.log_and_print("Party Quotients:")
-    Logger.log_and_print({party.name: str(party_quotients[party]) for party in party_quotients})
+    Logger.log_and_print(str({party.name: str(party_quotients[party]) for party in party_quotients}))
 
     highest_party = Tiebreak.highest_party(party_quotients)
     
@@ -56,7 +56,7 @@ def run(parties: list[Party], total_seats: int, achieved_quota: list[Candidate] 
             party.tally_votes(achieved_quota)
 
     Logger.log_and_print("The number of votes won by each party is shown below: ")
-    Logger.log_and_print(Party.names_in_list(parties, 1))
+    Logger.log_and_print(str(Party.names_in_list(parties, 1)))
 
     seats_for_parties = _get_num_seats_for_parties(total_seats, achieved_quota)
 
@@ -66,7 +66,7 @@ def run(parties: list[Party], total_seats: int, achieved_quota: list[Candidate] 
     while round < seats_for_parties:
         Logger.log_and_print("\nRound: " + str(round))
         Logger.log_and_print("Party Seats:")
-        Logger.log_and_print(Party.names_in_list(parties, 2))
+        Logger.log_and_print(str(Party.names_in_list(parties, 2)))
         highest_party = _find_highest_party(parties, achieved_quota, num_candidates, parties_are_candidates)
         Logger.log_and_print(highest_party.name + " wins a seat this round.")
         highest_party.seats += 1
@@ -75,7 +75,7 @@ def run(parties: list[Party], total_seats: int, achieved_quota: list[Candidate] 
 
 
 def main():
-    total_seats = input_integer("Please enter the number of seats: ")
+    total_seats = input_integer("Please enter the number of seats: ", False)
     parties_input = input("Please enter the parties, separated by commas: ")
     parties = [Party(name.strip(), []) for name in parties_input.split(",")]
 
@@ -85,8 +85,8 @@ def main():
     
     run(parties, total_seats)
 
-    Logger.log_and_print("\nThe parties have been apportioned the following number of seats:")
-    Logger.log_and_print(Party.names_in_list(parties, 2))
+    print("\nThe parties have been apportioned the following number of seats:")
+    print(Party.names_in_list(parties, 2))
 
 
 if __name__ == "__main__":

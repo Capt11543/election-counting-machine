@@ -31,7 +31,7 @@ def main():
     # Run the STV process
     achieved_quota, eliminated = STV.run(total_seats, ballots, candidates, is_special_election)
     Logger.log_and_print("\nThe following candidates have achieved a quota after transfers: ")
-    Logger.log_and_print(Candidate.names_in_list(achieved_quota, False, True))
+    Logger.log_and_print(str(Candidate.names_in_list(achieved_quota, False, True)))
 
     Logger.log_and_print("\n---\n")
 
@@ -39,14 +39,14 @@ def main():
     if not is_special_election:
         SeatAllocation.run(parties, total_seats, achieved_quota, len(candidates), parties_are_candidates)
         Logger.log_and_print("\nThe parties have been apportioned the following number of seats:")
-        Logger.log_and_print(Party.names_in_list(parties, 2))
+        Logger.log_and_print(str(Party.names_in_list(parties, 2)))
 
         Logger.log_and_print("\n---\n")
 
     elected = achieved_quota if is_special_election else SeatElection.run(parties, achieved_quota, eliminated, not parties_are_candidates)
 
     Logger.log_and_print("The following candidates have been elected to Parliament:")
-    Logger.log_and_print(Candidate.names_in_list(elected, True, False))
+    Logger.log_and_print(str(Candidate.names_in_list(elected, True, False)))
     Logger.log_and_print("Congratulations to the elected candidates!  Thank you for voting!")
 
 

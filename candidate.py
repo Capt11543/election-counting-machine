@@ -32,8 +32,8 @@ class Candidate:
             result = name[:name.index("(") - 1]
         except ValueError:
             result = name
-        finally:
-            return result
+        
+        return result
     
 
     def names_in_list(candidates: list[Candidate], include_party_affiliation = False, include_score = False, preference_level = -1):

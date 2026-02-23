@@ -106,7 +106,7 @@ def run(total_seats: int, ballots: list[Ballot], candidates: list[Candidate], is
     while len(achieved_quota) + len(eliminated) < len(candidates):
         Logger.log_and_print("\nRound " + str(round))
         _tally_candidate_votes(candidates, ballots, achieved_quota, is_special_election)
-        Logger.log_and_print(Candidate.names_in_list(candidates, False, True))
+        Logger.log_and_print(str(Candidate.names_in_list(candidates, False, True)))
         _save_round(rounds, candidates)
 
         in_contention = [candidate for candidate in candidates if candidate not in achieved_quota and candidate not in eliminated]
@@ -114,7 +114,7 @@ def run(total_seats: int, ballots: list[Ballot], candidates: list[Candidate], is
         if is_special_election:
             if len(in_contention) <= total_seats - len(achieved_quota):
                 Logger.log_and_print("There are as many unfilled seats as candidates remaining in contention.  The following candidates are elected:")
-                Logger.log_and_print(Candidate.names_in_list(in_contention, False, True))
+                Logger.log_and_print(str(Candidate.names_in_list(in_contention, False, True)))
                 achieved_quota.extend(in_contention)
                 continue
         
