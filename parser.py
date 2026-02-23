@@ -1,29 +1,31 @@
 from ballot import Ballot
 from candidate import Candidate
+from input import *
 from party import Party
 import json as JSON
+import logger as Logger
 
 
-def _convert_to_hypothetical(raw_order: list[str], party_names: list[str]):
-    if not party_names:
-        raise ValueError("party_names may not be empty or null")
+def _build_list(party_name: str, party_num: int):
+    candidate_names = []
+    num_candidates = input_integer("PARTY #" + str(party_num) + " - How many candidates are running for " + party_name + "? ")
+    
+    Logger.log_and_print("PARTY #" + str(party_num) + " - Enter the Minecraft usernames of the candidates in order below.")
+    for i in range(num_candidates):
+        name = input_string("  " + str(i + 1) + ". ")
+        candidate_names.append(name)
+    
+    return candidate_names
 
-    new_order: list[str] = []
-    found_in_order = {name: False for name in party_names}
 
-    for name in raw_order:
-        party_affiliation = Candidate.find_party_affiliation(name, False, "")
-        if party_affiliation in party_names:
-            if not found_in_order[party_affiliation]:
-                new_order.append(party_affiliation)
-                found_in_order[party_affiliation] = True
-        elif party_affiliation == "IND":
-            new_order.append(Candidate.strip_party_affiliation(name))
-        else:
-            new_order.append(name)
+def _build_party_lists():
+    lists = {}
+    num_parties = input_integer("How many parties are running in this election? ")
+    for i in range(num_parties):
+        party_name = input("PARTY #" + str(i + 1) + " - Enter the name of the party EXACTLY as it appears on the ballot: ")
+        lists[party_name] = _build_list(party_name, i + 1)
 
-    return new_order
-
+    return lists
 
 def _parse_raw_ballots(filename: str, simulate_new_system: bool, party_names=None):
     ballots: list[Ballot] = []
@@ -86,9 +88,10 @@ def _construct_final_lists(candidate_names: list[str], party_names: list[str], p
     return candidates, parties
 
 
-def parse_ballots(party_lists: dict[str, list[str]], parties_are_candidates=False) -> tuple[list[Ballot], list[Candidate], list[Party]]:
+def parse_ballots(parties_are_candidates=False) -> tuple[list[Ballot], list[Candidate], list[Party]]:
     filename = input("Please input the path to the ballots: ")
-    
+
+    party_lists = _build_party_lists() if parties_are_candidates else {}
     ballots = _parse_raw_ballots(filename, party_lists)
     
     candidate_names, party_names = _parse_candidate_names(ballots, party_lists, parties_are_candidates)
@@ -97,22 +100,3 @@ def parse_ballots(party_lists: dict[str, list[str]], parties_are_candidates=Fals
     candidates, parties = _construct_final_lists(candidate_names, party_names, party_lists, candidate_preferences, parties_are_candidates)
     
     return ballots, candidates, parties
-
-
-def parse_party_lists() -> dict[str, list[str]]:
-    filename = input("Please input the path to the party lists: ")
-
-    party_lists: dict[str, list[str]] = {}
-
-    with open(filename, 'r') as myfile:
-        raw_lists = myfile.read()
-        raw_lists = raw_lists.split("\n")
-
-        for plist in raw_lists:
-            parts = plist.split(": ")
-            party = parts[0]
-            candidates = parts[1].split(", ")
-
-            party_lists[party] = candidates
-    
-    return party_lists

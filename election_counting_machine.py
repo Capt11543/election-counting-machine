@@ -23,10 +23,7 @@ def main():
     parties_are_candidates = True and not is_special_election
 
     # Parse ballots
-    party_lists = {}
-    if parties_are_candidates:
-        party_lists = Parser.parse_party_lists()
-    ballots, candidates, parties = Parser.parse_ballots(party_lists, parties_are_candidates)
+    ballots, candidates, parties = Parser.parse_ballots(parties_are_candidates)
 
     # Run the STV process
     achieved_quota, eliminated = STV.run(total_seats, ballots, candidates, is_special_election)

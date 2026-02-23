@@ -20,6 +20,12 @@ def input_integer(message: str, log=True):
     return result
 
 
+def input_string(message: str, log=True):
+    result = input(message)
+    Logger.log(message + result)
+    return result
+
+
 def input_specific_string(message: str, valid_options: list[str], case_sensitive=False, log=True):
     result = ""
 
