@@ -1,8 +1,9 @@
-import tiebreak as Tiebreak
 from candidate import Candidate
+from decimal import *
+import tiebreak as Tiebreak
 import random
 import copy
-from decimal import *
+import logger as Logger
 
 # only needed for type checking
 from ballot import Ballot
@@ -35,7 +36,7 @@ def _reweight_ballots(threshold: float, candidate: Candidate, ballots: list[Ball
     if not is_special_election and not candidate.party_affiliation == "IND":
         return
 
-    print(f"{str(candidate.votes - threshold)} votes are now transferred.")
+    Logger.log_and_print(f"{str(candidate.votes - threshold)} votes are now transferred.")
 
     for ballot in ballots:
         if ballot.exhausted():
@@ -53,7 +54,7 @@ def _award_quotas(threshold: float, candidates: list[Candidate], ballots: list[B
                 achieved_quota.append(candidate)
 
                 awarded_quota = True
-                print(f"{candidate.name} has been elected with {candidate.votes} / {threshold} votes.")
+                Logger.log_and_print(f"{candidate.name} has been elected with {candidate.votes} / {threshold} votes.")
 
                 _reweight_ballots(threshold, candidate, ballots, is_special_election)
     
@@ -80,10 +81,10 @@ def _eliminate_lowest_scorer(in_contention: list[Candidate], round: int, rounds:
         if len(lowest_scorers) == 1:
             eliminated_candidate = lowest_scorers[0]
         else:
-            print("A tie has to be broken between: " + str(Candidate.names_in_list(lowest_scorers, False, True)))
+            Logger.log_and_print("A tie has to be broken between: " + str(Candidate.names_in_list(lowest_scorers, False, True)))
             eliminated_candidate = _break_tie(lowest_scorers, round, rounds, num_candidates)
     
-    print(eliminated_candidate.name + " has been eliminated with " + str(eliminated_candidate.votes) + " votes.")
+    Logger.log_and_print(eliminated_candidate.name + " has been eliminated with " + str(eliminated_candidate.votes) + " votes.")
     return eliminated_candidate
 
 
@@ -95,7 +96,7 @@ def _transfer_ballots(ballots: list[Ballot], candidates: list[Candidate], achiev
 def run(total_seats: int, ballots: list[Ballot], candidates: list[Candidate], is_special_election: bool):
     total_votes = len(ballots)
     threshold = _calculate_threshold(total_votes, total_seats)
-    print("Threshold to achieve quota: " + str(threshold))
+    Logger.log_and_print("Threshold to achieve quota: " + str(threshold))
 
     achieved_quota: list[Candidate] = []
     eliminated: list[Candidate] = []
@@ -103,17 +104,17 @@ def run(total_seats: int, ballots: list[Ballot], candidates: list[Candidate], is
     round = 0
     rounds: list[list[Candidate]] = []
     while len(achieved_quota) + len(eliminated) < len(candidates):
-        print("\nRound " + str(round))
+        Logger.log_and_print("\nRound " + str(round))
         _tally_candidate_votes(candidates, ballots, achieved_quota, is_special_election)
-        print(Candidate.names_in_list(candidates, False, True))
+        Logger.log_and_print(Candidate.names_in_list(candidates, False, True))
         _save_round(rounds, candidates)
 
         in_contention = [candidate for candidate in candidates if candidate not in achieved_quota and candidate not in eliminated]
         
         if is_special_election:
             if len(in_contention) <= total_seats - len(achieved_quota):
-                print("There are as many unfilled seats as candidates remaining in contention.  The following candidates are elected:")
-                print(Candidate.names_in_list(in_contention, False, True))
+                Logger.log_and_print("There are as many unfilled seats as candidates remaining in contention.  The following candidates are elected:")
+                Logger.log_and_print(Candidate.names_in_list(in_contention, False, True))
                 achieved_quota.extend(in_contention)
                 continue
         

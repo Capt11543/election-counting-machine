@@ -2,6 +2,7 @@ from candidate import Candidate
 from party import Party
 from typing import Any
 from decimal import *
+import logger as Logger
 
 
 def _find_extreme_scorers(compare_objects: dict[Any, float], highest=False):
@@ -46,18 +47,18 @@ def backtrack_rounds(tied: list[Candidate], round: int, rounds: list[list[Candid
         return None
     
     tied_this_round = [candidate for candidate in rounds[round - 1] if candidate.name in [candidate.name for candidate in tied]]
-    print("Backtracking to round " + str(round - 1) + ":")
-    print(Candidate.names_in_list(tied_this_round, False, True))
+    Logger.log_and_print("Backtracking to round " + str(round - 1) + ":")
+    Logger.log_and_print(Candidate.names_in_list(tied_this_round, False, True))
 
     lowest_scoring = lowest_candidate(tied_this_round)
 
     if len(lowest_scoring) == 1:
-        print("Tie broken after comparing votes from round " + str(round - 1) + ".")
+        Logger.log_and_print("Tie broken after comparing votes from round " + str(round - 1) + ".")
         return lowest_scoring[0]
     
     for candidate in tied_this_round:
         if candidate not in lowest_scoring:
-            print(candidate.name + " is no longer tied.")
+            Logger.log_and_print(candidate.name + " is no longer tied.")
             tied.remove(candidate)
     
     return backtrack_rounds(tied, round - 1, rounds)
@@ -68,18 +69,18 @@ def compare_preferences(tied: list[Candidate], num_candidates: int, highest=Fals
         ordinal_num = preference + 1
         ordinal_str = str(ordinal_num) + ("st" if (ordinal_num) % 10 == 1 and not (ordinal_num) // 10 == 1 else "nd" if (ordinal_num) % 10 == 2 and not (ordinal_num) // 10 == 1 else "rd" if (ordinal_num) % 10 == 3 and not (ordinal_num) // 10 == 1 else "th")
 
-        print("Comparing " + ordinal_str + "-choice votes...")
-        print(Candidate.names_in_list(tied, False, True, preference))
+        Logger.log_and_print("Comparing " + ordinal_str + "-choice votes...")
+        Logger.log_and_print(Candidate.names_in_list(tied, False, True, preference))
         lowest_scoring = highest_candidate(tied, preference) if highest else lowest_candidate(tied, preference)
 
         if len(lowest_scoring) == 1:
-            print("Tie broken after comparing " + ordinal_str + "-choice votes.")
+            Logger.log_and_print("Tie broken after comparing " + ordinal_str + "-choice votes.")
             return lowest_scoring[0]
         
         no_longer_tied = []
         for candidate in tied:
             if candidate not in lowest_scoring:
-                print(candidate.name + " is no longer tied.")
+                Logger.log_and_print(candidate.name + " is no longer tied.")
                 no_longer_tied.append(candidate)
         
         for candidate in no_longer_tied:

@@ -5,11 +5,15 @@ import parser as Parser
 import stv as STV
 import seat_allocation as SeatAllocation
 import seat_election as SeatElection
+import logger as Logger
 
 import random
 
 
 def main():
+    # Initialize logger
+    Logger.initialize()
+
     # Get input from the user
     is_special_election = yes_or_no("Is this a special election? (y/n): ")
     total_seats = input_integer("Please enter the number of seats: ") # Number of Winners
@@ -26,24 +30,24 @@ def main():
 
     # Run the STV process
     achieved_quota, eliminated = STV.run(total_seats, ballots, candidates, is_special_election)
-    print("\nThe following candidates have achieved a quota after transfers: ")
-    print(Candidate.names_in_list(achieved_quota, False, True))
+    Logger.log_and_print("\nThe following candidates have achieved a quota after transfers: ")
+    Logger.log_and_print(Candidate.names_in_list(achieved_quota, False, True))
 
-    print("\n---\n")
+    Logger.log_and_print("\n---\n")
 
     # Run the Seat Allocation process
     if not is_special_election:
         SeatAllocation.run(parties, total_seats, achieved_quota, len(candidates), parties_are_candidates)
-        print("\nThe parties have been apportioned the following number of seats:")
-        print(Party.names_in_list(parties, 2))
+        Logger.log_and_print("\nThe parties have been apportioned the following number of seats:")
+        Logger.log_and_print(Party.names_in_list(parties, 2))
 
-        print("\n---\n")
+        Logger.log_and_print("\n---\n")
 
     elected = achieved_quota if is_special_election else SeatElection.run(parties, achieved_quota, eliminated, not parties_are_candidates)
 
-    print("The following candidates have been elected to Parliament:")
-    print(Candidate.names_in_list(elected, True, False))
-    print("Congratulations to the elected candidates!  Thank you for voting!")
+    Logger.log_and_print("The following candidates have been elected to Parliament:")
+    Logger.log_and_print(Candidate.names_in_list(elected, True, False))
+    Logger.log_and_print("Congratulations to the elected candidates!  Thank you for voting!")
 
 
 if __name__ == "__main__":

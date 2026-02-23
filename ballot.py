@@ -1,5 +1,6 @@
 from candidate import Candidate
 from decimal import *
+import logger as Logger
 
 
 class Ballot:
@@ -48,7 +49,7 @@ class Ballot:
                 return
             
             if delta_pos > 0:
-                print(f"{str(self.value)} votes to {self.attributed_name()}.")
+                Logger.log_and_print(f"{str(self.value)} votes to {self.attributed_name()}.")
     
 
     def reweight(self, votes: int, threshold: float):
