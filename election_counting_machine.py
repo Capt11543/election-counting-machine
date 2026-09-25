@@ -25,6 +25,8 @@ def main():
     # Parse ballots
     ballots, candidates, parties = Parser.parse_ballots(parties_are_candidates)
 
+    Logger.log_and_print("\n---\n")
+
     # Run the STV process
     achieved_quota, eliminated = STV.run(total_seats, ballots, candidates, is_special_election)
     Logger.log_and_print("\nThe following candidates have achieved a quota after transfers: ")
@@ -40,7 +42,7 @@ def main():
 
         Logger.log_and_print("\n---\n")
 
-    elected = achieved_quota if is_special_election else SeatElection.run(parties, achieved_quota, eliminated, not parties_are_candidates)
+    elected = achieved_quota if not parties_are_candidates else SeatElection.run(parties, achieved_quota, eliminated, not parties_are_candidates)
 
     Logger.log_and_print("The following candidates have been elected to Parliament:")
     Logger.log_and_print(str(Candidate.names_in_list(elected, True, False)))

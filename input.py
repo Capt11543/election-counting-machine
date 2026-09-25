@@ -49,6 +49,6 @@ def input_specific_string(message: str, valid_options: list[str], case_sensitive
     return result
 
 
-def yes_or_no(string: str, log=True):
-    result = input_specific_string(string, ["y", "n"], False, log)
+def yes_or_no(message: str, log=True):
+    result = input_specific_string(message, ["y", "n"], False, log)
     return result.lower() == "y"

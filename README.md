@@ -19,5 +19,14 @@ Welcome to the Election Counting Machine. This script has been designed for use 
 10. Follow the instructions to ensure the script runs properly.
     Enter the random number you generated in step 4 as the seed.
     The path to the ballots should simply be the name of the .json file containing the ballot data (including the ".json" extension) if you placed said .json file properly in step 6.
+    See the next section for more information on configuring candidate lists.
     The results will be output to a file named `<currenttime>_vote_count.txt` for easy publishing.
 11. To ensure full legal compliance, compress the entire folder containing `election_counting_machine.py` and attach it to the transparency report.
+
+### Reusing Candidate Lists
+
+Individuals may wish to run the script multiple times using the same party and independent candidate lists. Instead of needing to re-enter the values on each run, you can now save the lists to a file the first time you enter them, and enter the path to the file on subsequent runs.
+
+After providing the path to the ballots, the script will prompt you to provide a path to a file containing the party lists. If you do not have a file to provide, simply leave the line blank. You will then be prompted to manually input the names of each party and candidate. Once you have completed this, you will be asked if you would like to save the lists for future use. To do so, answer "y" and input a name for the new file. The script will output the file in its root directory (i.e. the same directory as `election_counting_machine.py`).
+
+On a subsequent run, when you reach the prompt for a path to the party lists, you can provide the name of the file that you generated on the first run. You will also be able to share this file with other adjudicators or citizens to assist them with their runs of the script.
