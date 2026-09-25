@@ -9,7 +9,8 @@ def input_integer(message: str, log=True):
         no_problem = True
 
         user_input = input(message)
-        Logger.log(message + user_input)
+        if log:
+            Logger.log(message + user_input)
 
         try:
             result = int(user_input)
@@ -22,7 +23,8 @@ def input_integer(message: str, log=True):
 
 def input_string(message: str, log=True):
     result = input(message)
-    Logger.log(message + result)
+    if log:
+        Logger.log(message + result)
     return result
 
 

@@ -15,6 +15,7 @@ class Candidate:
         return next((candidate for candidate in list if name.startswith(candidate.name)), None)
     
 
+    # TODO: this function probably shouldn't be in this class
     def find_party_affiliation(name: str, parties_are_candidates=False, default="IND") -> str:
         if parties_are_candidates:
             return name
