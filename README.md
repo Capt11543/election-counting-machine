@@ -18,6 +18,6 @@ Welcome to the Election Counting Machine. This script has been designed for use 
 9. Run the script by typing `python election_counting_machine.py` into the terminal and pressing ENTER.
 10. Follow the instructions to ensure the script runs properly.
     Enter the random number you generated in step 4 as the seed.
-    The path to the ballots should simply be the name of the .json file containing the ballot data (including the ".json" extension) if you placed said .json file properly in step 3.
+    The path to the ballots should simply be the name of the .json file containing the ballot data (including the ".json" extension) if you placed said .json file properly in step 6.
     The results will be output to a file named `<currenttime>_vote_count.txt` for easy publishing.
 11. To ensure full legal compliance, compress the entire folder containing `election_counting_machine.py` and attach it to the transparency report.
